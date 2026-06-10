@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Para ti</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;1,300&family=DM+Serif+Display:ital@0;1&display=swap');
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #0a0a0a;
+      --fg: #f0ece4;
+      --dim: #6b6460;
+      --border: #2a2624;
+      --accent: #c8b89a;
+      --error: #c0614a;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'DM Mono', monospace;
+      font-size: 15px;
+    }
+
+    /* ─── PANTALLA DE LOGIN ─── */
+    #lock-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      padding: 2rem;
+      gap: 2.5rem;
+      transition: opacity 0.5s ease;
+    }
+
+    #lock-screen.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .lock-label {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      font-size: clamp(1.1rem, 3vw, 1.4rem);
+      color: var(--dim);
+      letter-spacing: 0.04em;
+    }
+
+    .date-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .field-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--dim);
+    }
+
+    .date-input-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .date-part {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      color: var(--fg);
+      font-family: 'DM Mono', monospace;
+      font-size: 1.6rem;
+      text-align: center;
+      outline: none;
+      transition: border-color 0.2s;
+      -moz-appearance: textfield;
+    }
+
+    .date-part::-webkit-outer-spin-button,
+    .date-part::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+    }
+
+    .date-part:focus {
+      border-bottom-color: var(--accent);
+    }
+
+    #inp-day   { width: 2.8rem; }
+    #inp-month { width: 2.8rem; }
+    #inp-year  { width: 4.2rem; }
+
+    .sep {
+      font-size: 1.4rem;
+      color: var(--dim);
+      user-select: none;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .error-msg {
+      font-size: 0.72rem;
+      color: var(--error);
+      letter-spacing: 0.06em;
+      min-height: 1rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .error-msg.visible { opacity: 1; }
+
+    .btn-enter {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--fg);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 0.7rem 2.2rem;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .btn-enter:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ─── PANTALLA PRINCIPAL ─── */
+    #main-screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+    }
+
+    #main-screen.visible {
+      display: flex;
+    }
+
+    #main-screen.fade-in {
+      opacity: 1;
+    }
+
+    .message-box {
+      width: 100%;
+      max-width: 560px;
+      border: 1px solid var(--border);
+      padding: 2.8rem 3rem;
+      position: relative;
+    }
+
+    /* esquina decorativa */
+    .message-box::before {
+      content: '';
+      position: absolute;
+      top: -1px; left: -1px;
+      width: 24px; height: 24px;
+      border-top: 2px solid var(--accent);
+      border-left: 2px solid var(--accent);
+    }
+
+    .message-box::after {
+      content: '';
+      position: absolute;
+      bottom: -1px; right: -1px;
+      width: 24px; height: 24px;
+      border-bottom: 2px solid var(--accent);
+      border-right: 2px solid var(--accent);
+    }
+
+    #message-display {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(1.3rem, 4vw, 1.8rem);
+      line-height: 1.55;
+      white-space: pre-wrap;
+      word-break: break-word;
+      min-height: 2rem;
+    }
+
+    /* ─── PANEL DE EDICIÓN (admin) ─── */
+    #edit-trigger {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--dim);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    #edit-trigger:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* modal de edición */
+    #edit-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10,10,10,0.85);
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      z-index: 100;
+    }
+
+    #edit-overlay.open {
+      display: flex;
+    }
+
+    .edit-panel {
+      width: 100%;
+      max-width: 520px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      padding: 2.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      position: relative;
+    }
+
+    .edit-panel h2 {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--dim);
+    }
+
+    /* campo de contraseña de admin */
+    #admin-gate {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .admin-input {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      color: var(--fg);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.95rem;
+      padding: 0.4rem 0;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .admin-input:focus {
+      border-bottom-color: var(--accent);
+    }
+
+    #edit-content {
+      display: none;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    #edit-content.unlocked {
+      display: flex;
+    }
+
+    #edit-textarea {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--fg);
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.1rem;
+      line-height: 1.5;
+      padding: 1rem;
+      resize: vertical;
+      min-height: 120px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    #edit-textarea:focus {
+      border-color: var(--accent);
+    }
+
+    .edit-actions {
+      display: flex;
+      gap: 0.8rem;
+      justify-content: flex-end;
+    }
+
+    .btn-small {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--fg);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.5rem 1.2rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-small:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-small.primary {
+      border-color: var(--fg);
+    }
+
+    .btn-small.primary:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .saved-note {
+      font-size: 0.65rem;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      opacity: 0;
+      transition: opacity 0.3s;
+      text-align: right;
+    }
+
+    .saved-note.show { opacity: 1; }
+
+    .close-btn {
+      position: absolute;
+      top: 1rem; right: 1.2rem;
+      background: none;
+      border: none;
+      color: var(--dim);
+      font-size: 1.1rem;
+      cursor: pointer;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+
+    .close-btn:hover { color: var(--fg); }
+  </style>
+</head>
+<body>
+
+  <!-- ── PANTALLA DE LOGIN ── -->
+  <div id="lock-screen">
+    <span class="lock-label">¿Cuál es la fecha?</span>
+
+    <div class="date-group">
+      <span class="field-label">Fecha</span>
+      <div class="date-input-row">
+        <input id="inp-day"   class="date-part" type="number" min="1" max="31"   placeholder="DD"   maxlength="2" />
+        <span class="sep">/</span>
+        <input id="inp-month" class="date-part" type="number" min="1" max="12"   placeholder="MM"   maxlength="2" />
+        <span class="sep">/</span>
+        <input id="inp-year"  class="date-part" type="number" min="1000" max="9999" placeholder="AAAA" maxlength="4" />
+      </div>
+      <span class="error-msg" id="err-msg">fecha incorrecta</span>
+    </div>
+
+    <button class="btn-enter" id="btn-enter">Entrar</button>
+  </div>
+
+  <!-- ── PANTALLA PRINCIPAL ── -->
+  <div id="main-screen">
+    <div class="message-box">
+      <div id="message-display">Hola, sunmi</div>
+    </div>
+  </div>
+
+  <!-- botón editar (solo visible dentro) -->
+  <button id="edit-trigger" style="display:none;">editar</button>
+
+  <!-- ── OVERLAY DE EDICIÓN ── -->
+  <div id="edit-overlay">
+    <div class="edit-panel">
+      <button class="close-btn" id="close-edit">✕</button>
+      <h2>Editor de mensaje</h2>
+
+      <!-- gate de contraseña admin -->
+      <div id="admin-gate">
+        <input id="admin-pw" class="admin-input" type="password" placeholder="contraseña de edición" />
+        <div class="edit-actions">
+          <button class="btn-small primary" id="btn-unlock">Continuar</button>
+        </div>
+        <span class="error-msg" id="err-admin"></span>
+      </div>
+
+      <!-- área de edición (se muestra tras autenticarse) -->
+      <div id="edit-content">
+        <textarea id="edit-textarea" rows="5"></textarea>
+        <span class="saved-note" id="saved-note">guardado ✓</span>
+        <div class="edit-actions">
+          <button class="btn-small" id="btn-cancel-edit">Cancelar</button>
+          <button class="btn-small primary" id="btn-save-edit">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ──────────────────────────────
+       CONFIGURACIÓN — edita aquí
+    ────────────────────────────── */
+    const ACCESS_DATE   = { day: 15, month: 1, year: 2006 };
+    const ADMIN_PASSWORD = "admin123";   // ← cambia esto
+    const DEFAULT_MSG   = "Hola, sunmi";
+    const STORAGE_KEY   = "sunmi_msg";
+    /* ────────────────────────────── */
+
+    const lockScreen  = document.getElementById('lock-screen');
+    const mainScreen  = document.getElementById('main-screen');
+    const msgDisplay  = document.getElementById('message-display');
+    const editTrigger = document.getElementById('edit-trigger');
+    const editOverlay = document.getElementById('edit-overlay');
+    const editContent = document.getElementById('edit-content');
+    const adminGate   = document.getElementById('admin-gate');
+    const adminPw     = document.getElementById('admin-pw');
+    const editTA      = document.getElementById('edit-textarea');
+    const errMsg      = document.getElementById('err-msg');
+    const errAdmin    = document.getElementById('err-admin');
+    const savedNote   = document.getElementById('saved-note');
+
+    // Cargar mensaje guardado
+    function loadMessage() {
+      return localStorage.getItem(STORAGE_KEY) || DEFAULT_MSG;
+    }
+
+    function renderMessage() {
+      msgDisplay.textContent = loadMessage();
+    }
+
+    // ─ Saltar focus automáticamente entre campos
+    function autoJump(el, maxLen, nextEl) {
+      el.addEventListener('input', () => {
+        if (el.value.length >= maxLen && nextEl) nextEl.focus();
+      });
+    }
+
+    const inpDay   = document.getElementById('inp-day');
+    const inpMonth = document.getElementById('inp-month');
+    const inpYear  = document.getElementById('inp-year');
+
+    autoJump(inpDay,   2, inpMonth);
+    autoJump(inpMonth, 2, inpYear);
+
+    // ─ Validar fecha
+    function checkDate() {
+      const d = parseInt(inpDay.value,   10);
+      const m = parseInt(inpMonth.value, 10);
+      const y = parseInt(inpYear.value,  10);
+
+      if (d === ACCESS_DATE.day &&
+          m === ACCESS_DATE.month &&
+          y === ACCESS_DATE.year) {
+        return true;
+      }
+      return false;
+    }
+
+    function showError(el, msg) {
+      el.textContent = msg;
+      el.classList.add('visible');
+      setTimeout(() => el.classList.remove('visible'), 2500);
+    }
+
+    // ─ Entrar
+    document.getElementById('btn-enter').addEventListener('click', enter);
+    [inpDay, inpMonth, inpYear].forEach(inp =>
+      inp.addEventListener('keydown', e => { if (e.key === 'Enter') enter(); })
+    );
+
+    function enter() {
+      if (!checkDate()) {
+        showError(errMsg, 'fecha incorrecta');
+        [inpDay, inpMonth, inpYear].forEach(i => i.value = '');
+        inpDay.focus();
+        return;
+      }
+      // Transición
+      lockScreen.classList.add('fade-out');
+      setTimeout(() => {
+        lockScreen.style.display = 'none';
+        renderMessage();
+        mainScreen.classList.add('visible');
+        editTrigger.style.display = 'block';
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => mainScreen.classList.add('fade-in'))
+        );
+      }, 500);
+    }
+
+    // ─ Abrir editor
+    editTrigger.addEventListener('click', () => {
+      adminGate.style.display   = 'flex';
+      editContent.classList.remove('unlocked');
+      adminPw.value = '';
+      errAdmin.classList.remove('visible');
+      editOverlay.classList.add('open');
+      setTimeout(() => adminPw.focus(), 100);
+    });
+
+    // ─ Cerrar editor
+    document.getElementById('close-edit').addEventListener('click', closeEditor);
+    document.getElementById('btn-cancel-edit').addEventListener('click', closeEditor);
+
+    function closeEditor() {
+      editOverlay.classList.remove('open');
+    }
+
+    // ─ Desbloquear con contraseña admin
+    document.getElementById('btn-unlock').addEventListener('click', unlockEdit);
+    adminPw.addEventListener('keydown', e => { if (e.key === 'Enter') unlockEdit(); });
+
+    function unlockEdit() {
+      if (adminPw.value === ADMIN_PASSWORD) {
+        adminGate.style.display = 'none';
+        editTA.value = loadMessage();
+        editContent.classList.add('unlocked');
+        editTA.focus();
+      } else {
+        showError(errAdmin, 'contraseña incorrecta');
+        adminPw.value = '';
+      }
+    }
+
+    // ─ Guardar mensaje
+    document.getElementById('btn-save-edit').addEventListener('click', saveEdit);
+    editTA.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) saveEdit();
+    });
+
+    function saveEdit() {
+      const newMsg = editTA.value.trim() || DEFAULT_MSG;
+      localStorage.setItem(STORAGE_KEY, newMsg);
+      renderMessage();
+      savedNote.classList.add('show');
+      setTimeout(() => savedNote.classList.remove('show'), 2000);
+      setTimeout(closeEditor, 600);
+    }
+  </script>
+</body>
+</html>
