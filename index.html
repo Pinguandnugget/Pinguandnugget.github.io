@@ -30,7 +30,6 @@
       font-size: 15px;
     }
 
-    /* ─── PANTALLA DE LOGIN ─── */
     #lock-screen {
       display: flex;
       flex-direction: column;
@@ -89,13 +88,9 @@
     }
 
     .date-part::-webkit-outer-spin-button,
-    .date-part::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-    }
+    .date-part::-webkit-inner-spin-button { -webkit-appearance: none; }
 
-    .date-part:focus {
-      border-bottom-color: var(--accent);
-    }
+    .date-part:focus { border-bottom-color: var(--accent); }
 
     #inp-day   { width: 2.8rem; }
     #inp-month { width: 2.8rem; }
@@ -138,7 +133,6 @@
       color: var(--accent);
     }
 
-    /* ─── PANTALLA PRINCIPAL ─── */
     #main-screen {
       display: none;
       flex-direction: column;
@@ -150,13 +144,8 @@
       transition: opacity 0.6s ease;
     }
 
-    #main-screen.visible {
-      display: flex;
-    }
-
-    #main-screen.fade-in {
-      opacity: 1;
-    }
+    #main-screen.visible { display: flex; }
+    #main-screen.fade-in { opacity: 1; }
 
     .message-box {
       width: 100%;
@@ -166,7 +155,6 @@
       position: relative;
     }
 
-    /* esquina decorativa */
     .message-box::before {
       content: '';
       position: absolute;
@@ -194,7 +182,6 @@
       min-height: 2rem;
     }
 
-    /* ─── PANEL DE EDICIÓN (admin) ─── */
     #edit-trigger {
       position: fixed;
       bottom: 2rem;
@@ -216,7 +203,6 @@
       color: var(--accent);
     }
 
-    /* modal de edición */
     #edit-overlay {
       display: none;
       position: fixed;
@@ -228,9 +214,7 @@
       z-index: 100;
     }
 
-    #edit-overlay.open {
-      display: flex;
-    }
+    #edit-overlay.open { display: flex; }
 
     .edit-panel {
       width: 100%;
@@ -253,7 +237,6 @@
       color: var(--dim);
     }
 
-    /* campo de contraseña de admin */
     #admin-gate {
       display: flex;
       flex-direction: column;
@@ -272,9 +255,7 @@
       transition: border-color 0.2s;
     }
 
-    .admin-input:focus {
-      border-bottom-color: var(--accent);
-    }
+    .admin-input:focus { border-bottom-color: var(--accent); }
 
     #edit-content {
       display: none;
@@ -282,9 +263,7 @@
       gap: 1rem;
     }
 
-    #edit-content.unlocked {
-      display: flex;
-    }
+    #edit-content.unlocked { display: flex; }
 
     #edit-textarea {
       background: transparent;
@@ -300,9 +279,7 @@
       transition: border-color 0.2s;
     }
 
-    #edit-textarea:focus {
-      border-color: var(--accent);
-    }
+    #edit-textarea:focus { border-color: var(--accent); }
 
     .edit-actions {
       display: flex;
@@ -323,19 +300,9 @@
       transition: all 0.2s;
     }
 
-    .btn-small:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-
-    .btn-small.primary {
-      border-color: var(--fg);
-    }
-
-    .btn-small.primary:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
+    .btn-small:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-small.primary { border-color: var(--fg); }
+    .btn-small.primary:hover { border-color: var(--accent); color: var(--accent); }
 
     .saved-note {
       font-size: 0.65rem;
@@ -361,46 +328,45 @@
     }
 
     .close-btn:hover { color: var(--fg); }
+
+    .loading-msg {
+      font-size: 0.7rem;
+      color: var(--dim);
+      letter-spacing: 0.1em;
+      font-style: italic;
+    }
   </style>
 </head>
 <body>
 
-  <!-- ── PANTALLA DE LOGIN ── -->
   <div id="lock-screen">
     <span class="lock-label">¿Cuál es la fecha?</span>
-
     <div class="date-group">
       <span class="field-label">Fecha</span>
       <div class="date-input-row">
-        <input id="inp-day"   class="date-part" type="number" min="1" max="31"   placeholder="DD"   maxlength="2" />
+        <input id="inp-day"   class="date-part" type="number" min="1" max="31"   placeholder="DD"   />
         <span class="sep">/</span>
-        <input id="inp-month" class="date-part" type="number" min="1" max="12"   placeholder="MM"   maxlength="2" />
+        <input id="inp-month" class="date-part" type="number" min="1" max="12"   placeholder="MM"   />
         <span class="sep">/</span>
-        <input id="inp-year"  class="date-part" type="number" min="1000" max="9999" placeholder="AAAA" maxlength="4" />
+        <input id="inp-year"  class="date-part" type="number" min="1000" max="9999" placeholder="AAAA" />
       </div>
       <span class="error-msg" id="err-msg">fecha incorrecta</span>
     </div>
-
     <button class="btn-enter" id="btn-enter">Entrar</button>
   </div>
 
-  <!-- ── PANTALLA PRINCIPAL ── -->
   <div id="main-screen">
     <div class="message-box">
-      <div id="message-display">Hola, sunmi</div>
+      <div id="message-display"><span class="loading-msg">cargando...</span></div>
     </div>
   </div>
 
-  <!-- botón editar (solo visible dentro) -->
   <button id="edit-trigger" style="display:none;">editar</button>
 
-  <!-- ── OVERLAY DE EDICIÓN ── -->
   <div id="edit-overlay">
     <div class="edit-panel">
       <button class="close-btn" id="close-edit">✕</button>
       <h2>Editor de mensaje</h2>
-
-      <!-- gate de contraseña admin -->
       <div id="admin-gate">
         <input id="admin-pw" class="admin-input" type="password" placeholder="contraseña de edición" />
         <div class="edit-actions">
@@ -408,8 +374,6 @@
         </div>
         <span class="error-msg" id="err-admin"></span>
       </div>
-
-      <!-- área de edición (se muestra tras autenticarse) -->
       <div id="edit-content">
         <textarea id="edit-textarea" rows="5"></textarea>
         <span class="saved-note" id="saved-note">guardado ✓</span>
@@ -421,16 +385,31 @@
     </div>
   </div>
 
-  <script>
-    /* ──────────────────────────────
-       CONFIGURACIÓN — edita aquí
-    ────────────────────────────── */
-    const ACCESS_DATE   = { day: 15, month: 1, year: 2026 };
-    const ADMIN_PASSWORD = "Pingu";   // ← cambia esto
-    const DEFAULT_MSG   = "Hola, sunmi";
-    const STORAGE_KEY   = "sunmi_msg";
-    /* ────────────────────────────── */
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+    /* ── CONFIGURACIÓN ── */
+    const ACCESS_DATE    = { day: 15, month: 1, year: 2026 };
+    const ADMIN_PASSWORD = "Pingu";   // ← cambia esto
+    const DEFAULT_MSG    = "Hola, sunmi";
+    const DOC_PATH       = { collection: "config", id: "mensaje" };
+
+    /* ── FIREBASE ── */
+    const firebaseConfig = {
+      apiKey: "AIzaSyBuwIzk4QTAgdkHWbO4wezoZu0GJV_g4KU",
+      authDomain: "sunmi-76dac.firebaseapp.com",
+      projectId: "sunmi-76dac",
+      storageBucket: "sunmi-76dac.firebasestorage.app",
+      messagingSenderId: "139512782548",
+      appId: "1:139512782548:web:2b441f886590c321e6e541"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+
+    /* ── ELEMENTOS ── */
     const lockScreen  = document.getElementById('lock-screen');
     const mainScreen  = document.getElementById('main-screen');
     const msgDisplay  = document.getElementById('message-display');
@@ -443,42 +422,40 @@
     const errMsg      = document.getElementById('err-msg');
     const errAdmin    = document.getElementById('err-admin');
     const savedNote   = document.getElementById('saved-note');
+    const inpDay      = document.getElementById('inp-day');
+    const inpMonth    = document.getElementById('inp-month');
+    const inpYear     = document.getElementById('inp-year');
 
-    // Cargar mensaje guardado
-    function loadMessage() {
-      return localStorage.getItem(STORAGE_KEY) || DEFAULT_MSG;
+    /* ── FIREBASE: leer y guardar ── */
+    async function loadMessage() {
+      try {
+        const snap = await getDoc(doc(db, DOC_PATH.collection, DOC_PATH.id));
+        return snap.exists() ? snap.data().texto : DEFAULT_MSG;
+      } catch {
+        return DEFAULT_MSG;
+      }
     }
 
-    function renderMessage() {
-      msgDisplay.textContent = loadMessage();
+    async function saveMessage(texto) {
+      await setDoc(doc(db, DOC_PATH.collection, DOC_PATH.id), { texto });
     }
 
-    // ─ Saltar focus automáticamente entre campos
+    /* ── AUTO-JUMP ── */
     function autoJump(el, maxLen, nextEl) {
       el.addEventListener('input', () => {
         if (el.value.length >= maxLen && nextEl) nextEl.focus();
       });
     }
 
-    const inpDay   = document.getElementById('inp-day');
-    const inpMonth = document.getElementById('inp-month');
-    const inpYear  = document.getElementById('inp-year');
-
-    autoJump(inpDay,   2, inpMonth);
+    autoJump(inpDay, 2, inpMonth);
     autoJump(inpMonth, 2, inpYear);
 
-    // ─ Validar fecha
+    /* ── VALIDAR FECHA ── */
     function checkDate() {
       const d = parseInt(inpDay.value,   10);
       const m = parseInt(inpMonth.value, 10);
       const y = parseInt(inpYear.value,  10);
-
-      if (d === ACCESS_DATE.day &&
-          m === ACCESS_DATE.month &&
-          y === ACCESS_DATE.year) {
-        return true;
-      }
-      return false;
+      return d === ACCESS_DATE.day && m === ACCESS_DATE.month && y === ACCESS_DATE.year;
     }
 
     function showError(el, msg) {
@@ -487,35 +464,39 @@
       setTimeout(() => el.classList.remove('visible'), 2500);
     }
 
-    // ─ Entrar
-    document.getElementById('btn-enter').addEventListener('click', enter);
-    [inpDay, inpMonth, inpYear].forEach(inp =>
-      inp.addEventListener('keydown', e => { if (e.key === 'Enter') enter(); })
-    );
-
-    function enter() {
+    /* ── ENTRAR ── */
+    async function enter() {
       if (!checkDate()) {
         showError(errMsg, 'fecha incorrecta');
         [inpDay, inpMonth, inpYear].forEach(i => i.value = '');
         inpDay.focus();
         return;
       }
-      // Transición
+
       lockScreen.classList.add('fade-out');
-      setTimeout(() => {
+
+      setTimeout(async () => {
         lockScreen.style.display = 'none';
-        renderMessage();
         mainScreen.classList.add('visible');
         editTrigger.style.display = 'block';
+
+        const texto = await loadMessage();
+        msgDisplay.textContent = texto;
+
         requestAnimationFrame(() =>
           requestAnimationFrame(() => mainScreen.classList.add('fade-in'))
         );
       }, 500);
     }
 
-    // ─ Abrir editor
+    document.getElementById('btn-enter').addEventListener('click', enter);
+    [inpDay, inpMonth, inpYear].forEach(inp =>
+      inp.addEventListener('keydown', e => { if (e.key === 'Enter') enter(); })
+    );
+
+    /* ── ABRIR EDITOR ── */
     editTrigger.addEventListener('click', () => {
-      adminGate.style.display   = 'flex';
+      adminGate.style.display = 'flex';
       editContent.classList.remove('unlocked');
       adminPw.value = '';
       errAdmin.classList.remove('visible');
@@ -523,22 +504,16 @@
       setTimeout(() => adminPw.focus(), 100);
     });
 
-    // ─ Cerrar editor
+    /* ── CERRAR EDITOR ── */
+    function closeEditor() { editOverlay.classList.remove('open'); }
     document.getElementById('close-edit').addEventListener('click', closeEditor);
     document.getElementById('btn-cancel-edit').addEventListener('click', closeEditor);
 
-    function closeEditor() {
-      editOverlay.classList.remove('open');
-    }
-
-    // ─ Desbloquear con contraseña admin
-    document.getElementById('btn-unlock').addEventListener('click', unlockEdit);
-    adminPw.addEventListener('keydown', e => { if (e.key === 'Enter') unlockEdit(); });
-
+    /* ── DESBLOQUEAR ── */
     function unlockEdit() {
       if (adminPw.value === ADMIN_PASSWORD) {
         adminGate.style.display = 'none';
-        editTA.value = loadMessage();
+        editTA.value = msgDisplay.textContent;
         editContent.classList.add('unlocked');
         editTA.focus();
       } else {
@@ -547,20 +522,23 @@
       }
     }
 
-    // ─ Guardar mensaje
-    document.getElementById('btn-save-edit').addEventListener('click', saveEdit);
-    editTA.addEventListener('keydown', e => {
-      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) saveEdit();
-    });
+    document.getElementById('btn-unlock').addEventListener('click', unlockEdit);
+    adminPw.addEventListener('keydown', e => { if (e.key === 'Enter') unlockEdit(); });
 
-    function saveEdit() {
+    /* ── GUARDAR ── */
+    async function saveEdit() {
       const newMsg = editTA.value.trim() || DEFAULT_MSG;
-      localStorage.setItem(STORAGE_KEY, newMsg);
-      renderMessage();
+      await saveMessage(newMsg);
+      msgDisplay.textContent = newMsg;
       savedNote.classList.add('show');
       setTimeout(() => savedNote.classList.remove('show'), 2000);
       setTimeout(closeEditor, 600);
     }
+
+    document.getElementById('btn-save-edit').addEventListener('click', saveEdit);
+    editTA.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) saveEdit();
+    });
   </script>
 </body>
 </html>
