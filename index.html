@@ -7,11 +7,7 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;1,300&family=DM+Serif+Display:ital@0;1&display=swap');
 
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
       --bg: #0a0a0a;
@@ -20,525 +16,598 @@
       --border: #2a2624;
       --accent: #c8b89a;
       --error: #c0614a;
+      --card-bg: #111010;
     }
 
-    html, body {
-      height: 100%;
-      background: var(--bg);
-      color: var(--fg);
-      font-family: 'DM Mono', monospace;
-      font-size: 15px;
-    }
+    html, body { min-height: 100%; background: var(--bg); color: var(--fg); font-family: 'DM Mono', monospace; font-size: 15px; }
 
+    /* ── LOCK ── */
     #lock-screen {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      padding: 2rem;
-      gap: 2.5rem;
-      transition: opacity 0.5s ease;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; height: 100vh; padding: 2rem;
+      gap: 2.5rem; transition: opacity 0.5s ease;
     }
-
-    #lock-screen.fade-out {
-      opacity: 0;
-      pointer-events: none;
-    }
+    #lock-screen.fade-out { opacity: 0; pointer-events: none; }
 
     .lock-label {
-      font-family: 'DM Serif Display', serif;
-      font-style: italic;
-      font-size: clamp(1.1rem, 3vw, 1.4rem);
-      color: var(--dim);
-      letter-spacing: 0.04em;
+      font-family: 'DM Serif Display', serif; font-style: italic;
+      font-size: clamp(1.1rem, 3vw, 1.4rem); color: var(--dim); letter-spacing: 0.04em;
     }
-
-    .date-group {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .field-label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.18em;
-      color: var(--dim);
-    }
-
-    .date-input-row {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
+    .date-group { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; }
+    .field-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.18em; color: var(--dim); }
+    .date-input-row { display: flex; align-items: center; gap: 0.5rem; }
     .date-part {
-      background: transparent;
-      border: none;
-      border-bottom: 1px solid var(--border);
-      color: var(--fg);
-      font-family: 'DM Mono', monospace;
-      font-size: 1.6rem;
-      text-align: center;
-      outline: none;
-      transition: border-color 0.2s;
-      -moz-appearance: textfield;
+      background: transparent; border: none; border-bottom: 1px solid var(--border);
+      color: var(--fg); font-family: 'DM Mono', monospace; font-size: 1.6rem;
+      text-align: center; outline: none; transition: border-color 0.2s; -moz-appearance: textfield;
     }
-
-    .date-part::-webkit-outer-spin-button,
-    .date-part::-webkit-inner-spin-button { -webkit-appearance: none; }
-
+    .date-part::-webkit-outer-spin-button, .date-part::-webkit-inner-spin-button { -webkit-appearance: none; }
     .date-part:focus { border-bottom-color: var(--accent); }
-
-    #inp-day   { width: 2.8rem; }
-    #inp-month { width: 2.8rem; }
-    #inp-year  { width: 4.2rem; }
-
-    .sep {
-      font-size: 1.4rem;
-      color: var(--dim);
-      user-select: none;
-      line-height: 1;
-      margin-bottom: 4px;
-    }
-
-    .error-msg {
-      font-size: 0.72rem;
-      color: var(--error);
-      letter-spacing: 0.06em;
-      min-height: 1rem;
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-
+    #inp-day { width: 2.8rem; } #inp-month { width: 2.8rem; } #inp-year { width: 4.2rem; }
+    .sep { font-size: 1.4rem; color: var(--dim); user-select: none; line-height: 1; margin-bottom: 4px; }
+    .error-msg { font-size: 0.72rem; color: var(--error); letter-spacing: 0.06em; min-height: 1rem; opacity: 0; transition: opacity 0.3s; }
     .error-msg.visible { opacity: 1; }
-
     .btn-enter {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--fg);
-      font-family: 'DM Mono', monospace;
-      font-size: 0.72rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      padding: 0.7rem 2.2rem;
-      cursor: pointer;
-      transition: border-color 0.2s, color 0.2s;
+      background: transparent; border: 1px solid var(--border); color: var(--fg);
+      font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.2em;
+      text-transform: uppercase; padding: 0.7rem 2.2rem; cursor: pointer; transition: border-color 0.2s, color 0.2s;
     }
+    .btn-enter:hover { border-color: var(--accent); color: var(--accent); }
 
-    .btn-enter:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-
+    /* ── MAIN (ALBUM) ── */
     #main-screen {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 2rem;
-      opacity: 0;
-      transition: opacity 0.6s ease;
+      display: none; flex-direction: column; align-items: center;
+      padding: 3rem 1.5rem 4rem; opacity: 0; transition: opacity 0.6s ease;
     }
-
     #main-screen.visible { display: flex; }
     #main-screen.fade-in { opacity: 1; }
 
-    .message-box {
+    .album-title {
+      font-family: 'DM Serif Display', serif; font-style: italic;
+      font-size: clamp(1rem, 2.5vw, 1.2rem); color: var(--dim);
+      letter-spacing: 0.06em; margin-bottom: 2.5rem;
+    }
+
+    .album-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.2rem;
       width: 100%;
-      max-width: 560px;
+      max-width: 700px;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 1.8rem 1.6rem 1.4rem;
+      cursor: pointer;
+      position: relative;
+      min-height: 160px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: border-color 0.25s, transform 0.2s;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute; top: -1px; left: -1px;
+      width: 18px; height: 18px;
+      border-top: 1.5px solid var(--accent);
+      border-left: 1.5px solid var(--accent);
+      transition: width 0.25s, height 0.25s;
+    }
+    .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .card:hover::before { width: 28px; height: 28px; }
+
+    .card-label {
+      font-size: 0.6rem; text-transform: uppercase;
+      letter-spacing: 0.2em; color: var(--dim); margin-bottom: 0.5rem;
+    }
+    .card-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(1.1rem, 2.5vw, 1.35rem);
+      line-height: 1.3; color: var(--fg);
+    }
+    .card-sub {
+      font-size: 0.72rem; color: var(--dim);
+      margin-top: 0.4rem; line-height: 1.4;
+    }
+    .card-footer {
+      display: flex; justify-content: flex-end;
+      margin-top: 1rem;
+    }
+
+    /* botón + */
+    .btn-add {
+      width: 32px; height: 32px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--dim);
+      font-size: 1.1rem;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+      border-radius: 2px;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 2;
+    }
+    .btn-add:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* archivos adjuntos dentro de la card */
+    .card-files {
+      margin-top: 0.8rem;
+      display: flex; flex-wrap: wrap; gap: 0.4rem;
+    }
+    .file-chip {
+      font-size: 0.6rem; letter-spacing: 0.08em;
+      color: var(--dim); border: 1px solid var(--border);
+      padding: 0.2rem 0.5rem; border-radius: 1px;
+      white-space: nowrap; overflow: hidden;
+      text-overflow: ellipsis; max-width: 120px;
+    }
+    .file-chip a { color: var(--accent); text-decoration: none; }
+    .file-chip a:hover { text-decoration: underline; }
+
+    /* ── PANEL INTERIOR (al entrar a un bloque) ── */
+    #inner-screen {
+      display: none;
+      position: fixed; inset: 0;
+      background: var(--bg);
+      z-index: 50;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    #inner-screen.visible { display: flex; }
+    #inner-screen.fade-in { opacity: 1; }
+
+    .inner-box {
+      width: 100%; max-width: 560px;
       border: 1px solid var(--border);
       padding: 2.8rem 3rem;
       position: relative;
     }
-
-    .message-box::before {
-      content: '';
-      position: absolute;
-      top: -1px; left: -1px;
+    .inner-box::before {
+      content: ''; position: absolute; top: -1px; left: -1px;
       width: 24px; height: 24px;
-      border-top: 2px solid var(--accent);
-      border-left: 2px solid var(--accent);
+      border-top: 2px solid var(--accent); border-left: 2px solid var(--accent);
     }
-
-    .message-box::after {
-      content: '';
-      position: absolute;
-      bottom: -1px; right: -1px;
+    .inner-box::after {
+      content: ''; position: absolute; bottom: -1px; right: -1px;
       width: 24px; height: 24px;
-      border-bottom: 2px solid var(--accent);
-      border-right: 2px solid var(--accent);
+      border-bottom: 2px solid var(--accent); border-right: 2px solid var(--accent);
     }
-
-    #message-display {
+    .inner-label {
+      font-size: 0.6rem; text-transform: uppercase;
+      letter-spacing: 0.2em; color: var(--dim); margin-bottom: 1.2rem;
+    }
+    #inner-content {
       font-family: 'DM Serif Display', serif;
-      font-size: clamp(1.3rem, 4vw, 1.8rem);
-      line-height: 1.55;
-      white-space: pre-wrap;
-      word-break: break-word;
-      min-height: 2rem;
+      font-size: clamp(1.2rem, 3.5vw, 1.6rem);
+      line-height: 1.55; white-space: pre-wrap; word-break: break-word; min-height: 2rem;
     }
 
+    /* archivos en inner */
+    #inner-files { margin-top: 1.4rem; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .inner-file-chip {
+      font-size: 0.65rem; letter-spacing: 0.08em;
+      color: var(--accent); border: 1px solid var(--border);
+      padding: 0.3rem 0.7rem; border-radius: 1px;
+    }
+    .inner-file-chip a { color: var(--accent); text-decoration: none; }
+    .inner-file-chip a:hover { text-decoration: underline; }
+
+    .btn-back {
+      position: fixed; top: 1.5rem; left: 1.5rem;
+      background: transparent; border: 1px solid var(--border);
+      color: var(--dim); font-family: 'DM Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase;
+      padding: 0.5rem 1rem; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-back:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── EDIT TRIGGER ── */
     #edit-trigger {
-      position: fixed;
-      bottom: 2rem;
-      right: 2rem;
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--dim);
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      padding: 0.5rem 1rem;
-      cursor: pointer;
-      transition: all 0.2s;
+      position: fixed; bottom: 2rem; right: 2rem;
+      background: transparent; border: 1px solid var(--border);
+      color: var(--dim); font-family: 'DM Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase;
+      padding: 0.5rem 1rem; cursor: pointer; transition: all 0.2s; display: none;
     }
+    #edit-trigger:hover { border-color: var(--accent); color: var(--accent); }
 
-    #edit-trigger:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-
+    /* ── EDIT OVERLAY ── */
     #edit-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(10,10,10,0.85);
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-      z-index: 100;
+      display: none; position: fixed; inset: 0;
+      background: rgba(10,10,10,0.88);
+      align-items: center; justify-content: center;
+      padding: 2rem; z-index: 200;
     }
-
     #edit-overlay.open { display: flex; }
-
     .edit-panel {
-      width: 100%;
-      max-width: 520px;
-      border: 1px solid var(--border);
-      background: var(--bg);
-      padding: 2.2rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1.2rem;
-      position: relative;
+      width: 100%; max-width: 520px;
+      border: 1px solid var(--border); background: var(--bg);
+      padding: 2.2rem; display: flex; flex-direction: column; gap: 1.2rem; position: relative;
     }
-
     .edit-panel h2 {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.68rem;
-      font-weight: 400;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--dim);
+      font-family: 'DM Mono', monospace; font-size: 0.68rem; font-weight: 400;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--dim);
     }
-
-    #admin-gate {
-      display: flex;
-      flex-direction: column;
-      gap: 0.8rem;
-    }
-
+    #admin-gate { display: flex; flex-direction: column; gap: 0.8rem; }
     .admin-input {
-      background: transparent;
-      border: none;
-      border-bottom: 1px solid var(--border);
-      color: var(--fg);
-      font-family: 'DM Mono', monospace;
-      font-size: 0.95rem;
-      padding: 0.4rem 0;
-      outline: none;
-      transition: border-color 0.2s;
+      background: transparent; border: none; border-bottom: 1px solid var(--border);
+      color: var(--fg); font-family: 'DM Mono', monospace;
+      font-size: 0.95rem; padding: 0.4rem 0; outline: none; transition: border-color 0.2s;
     }
-
     .admin-input:focus { border-bottom-color: var(--accent); }
-
-    #edit-content {
-      display: none;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
+    #edit-content { display: none; flex-direction: column; gap: 1rem; }
     #edit-content.unlocked { display: flex; }
-
     #edit-textarea {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--fg);
-      font-family: 'DM Serif Display', serif;
-      font-size: 1.1rem;
-      line-height: 1.5;
-      padding: 1rem;
-      resize: vertical;
-      min-height: 120px;
-      outline: none;
-      transition: border-color 0.2s;
+      background: transparent; border: 1px solid var(--border); color: var(--fg);
+      font-family: 'DM Serif Display', serif; font-size: 1.1rem; line-height: 1.5;
+      padding: 1rem; resize: vertical; min-height: 120px; outline: none; transition: border-color 0.2s;
     }
-
     #edit-textarea:focus { border-color: var(--accent); }
-
-    .edit-actions {
-      display: flex;
-      gap: 0.8rem;
-      justify-content: flex-end;
-    }
-
+    .edit-actions { display: flex; gap: 0.8rem; justify-content: flex-end; }
     .btn-small {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--fg);
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      padding: 0.5rem 1.2rem;
-      cursor: pointer;
-      transition: all 0.2s;
+      background: transparent; border: 1px solid var(--border); color: var(--fg);
+      font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em;
+      text-transform: uppercase; padding: 0.5rem 1.2rem; cursor: pointer; transition: all 0.2s;
     }
-
     .btn-small:hover { border-color: var(--accent); color: var(--accent); }
     .btn-small.primary { border-color: var(--fg); }
     .btn-small.primary:hover { border-color: var(--accent); color: var(--accent); }
-
-    .saved-note {
-      font-size: 0.65rem;
-      color: var(--accent);
-      letter-spacing: 0.1em;
-      opacity: 0;
-      transition: opacity 0.3s;
-      text-align: right;
-    }
-
+    .saved-note { font-size: 0.65rem; color: var(--accent); letter-spacing: 0.1em; opacity: 0; transition: opacity 0.3s; text-align: right; }
     .saved-note.show { opacity: 1; }
-
     .close-btn {
-      position: absolute;
-      top: 1rem; right: 1.2rem;
-      background: none;
-      border: none;
-      color: var(--dim);
-      font-size: 1.1rem;
-      cursor: pointer;
-      line-height: 1;
-      transition: color 0.2s;
+      position: absolute; top: 1rem; right: 1.2rem;
+      background: none; border: none; color: var(--dim); font-size: 1.1rem;
+      cursor: pointer; line-height: 1; transition: color 0.2s;
     }
-
     .close-btn:hover { color: var(--fg); }
 
-    .loading-msg {
-      font-size: 0.7rem;
-      color: var(--dim);
-      letter-spacing: 0.1em;
-      font-style: italic;
+    /* upload progress */
+    .upload-note { font-size: 0.65rem; color: var(--dim); letter-spacing: 0.08em; font-style: italic; }
+
+    @media (max-width: 480px) {
+      .album-grid { grid-template-columns: 1fr; }
+      .inner-box { padding: 2rem 1.4rem; }
     }
   </style>
 </head>
 <body>
 
-  <div id="lock-screen">
-    <span class="lock-label">¿Cuál es la fecha?</span>
-    <div class="date-group">
-      <span class="field-label">Fecha</span>
-      <div class="date-input-row">
-        <input id="inp-day"   class="date-part" type="number" min="1" max="31"   placeholder="DD"   />
-        <span class="sep">/</span>
-        <input id="inp-month" class="date-part" type="number" min="1" max="12"   placeholder="MM"   />
-        <span class="sep">/</span>
-        <input id="inp-year"  class="date-part" type="number" min="1000" max="9999" placeholder="AAAA" />
-      </div>
-      <span class="error-msg" id="err-msg">fecha incorrecta</span>
+<!-- ── LOCK ── -->
+<div id="lock-screen">
+  <span class="lock-label">¿Cuál es la fecha?</span>
+  <div class="date-group">
+    <span class="field-label">Fecha</span>
+    <div class="date-input-row">
+      <input id="inp-day"   class="date-part" type="number" min="1" max="31"   placeholder="DD" />
+      <span class="sep">/</span>
+      <input id="inp-month" class="date-part" type="number" min="1" max="12"   placeholder="MM" />
+      <span class="sep">/</span>
+      <input id="inp-year"  class="date-part" type="number" min="1000" max="9999" placeholder="AAAA" />
     </div>
-    <button class="btn-enter" id="btn-enter">Entrar</button>
+    <span class="error-msg" id="err-msg">fecha incorrecta</span>
   </div>
+  <button class="btn-enter" id="btn-enter">Entrar</button>
+</div>
 
-  <div id="main-screen">
-    <div class="message-box">
-      <div id="message-display"><span class="loading-msg">cargando...</span></div>
+<!-- ── ALBUM ── -->
+<div id="main-screen">
+  <span class="album-title">— Álbum —</span>
+  <div class="album-grid" id="album-grid">
+    <!-- generado por JS -->
+  </div>
+</div>
+
+<!-- ── INNER VIEW ── -->
+<div id="inner-screen">
+  <button class="btn-back" id="btn-back">← volver</button>
+  <div class="inner-box">
+    <div class="inner-label" id="inner-label"></div>
+    <div id="inner-content"></div>
+    <div id="inner-files"></div>
+  </div>
+</div>
+
+<button id="edit-trigger">editar</button>
+
+<!-- ── EDIT OVERLAY ── -->
+<div id="edit-overlay">
+  <div class="edit-panel">
+    <button class="close-btn" id="close-edit">✕</button>
+    <h2>Editor de mensaje</h2>
+    <div id="admin-gate">
+      <input id="admin-pw" class="admin-input" type="password" placeholder="contraseña de edición" />
+      <div class="edit-actions">
+        <button class="btn-small primary" id="btn-unlock">Continuar</button>
+      </div>
+      <span class="error-msg" id="err-admin"></span>
+    </div>
+    <div id="edit-content">
+      <textarea id="edit-textarea" rows="5"></textarea>
+      <span class="saved-note" id="saved-note">guardado ✓</span>
+      <div class="edit-actions">
+        <button class="btn-small" id="btn-cancel-edit">Cancelar</button>
+        <button class="btn-small primary" id="btn-save-edit">Guardar</button>
+      </div>
     </div>
   </div>
+</div>
 
-  <button id="edit-trigger" style="display:none;">editar</button>
+<input type="file" id="file-input" multiple style="display:none" />
 
-  <div id="edit-overlay">
-    <div class="edit-panel">
-      <button class="close-btn" id="close-edit">✕</button>
-      <h2>Editor de mensaje</h2>
-      <div id="admin-gate">
-        <input id="admin-pw" class="admin-input" type="password" placeholder="contraseña de edición" />
-        <div class="edit-actions">
-          <button class="btn-small primary" id="btn-unlock">Continuar</button>
-        </div>
-        <span class="error-msg" id="err-admin"></span>
-      </div>
-      <div id="edit-content">
-        <textarea id="edit-textarea" rows="5"></textarea>
-        <span class="saved-note" id="saved-note">guardado ✓</span>
-        <div class="edit-actions">
-          <button class="btn-small" id="btn-cancel-edit">Cancelar</button>
-          <button class="btn-small primary" id="btn-save-edit">Guardar</button>
-        </div>
-      </div>
-    </div>
-  </div>
+<script type="module">
+  import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
-  <!-- Firebase SDK -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  /* ── CONFIG ── */
+  const ACCESS_DATE    = { day: 15, month: 1, year: 2026 };
+  const ADMIN_PASSWORD = "Pingu";
+  const DEFAULT_MSG    = "Hola, Sunmi";
 
-    /* ── CONFIGURACIÓN ── */
-    const ACCESS_DATE    = { day: 15, month: 1, year: 2026 };
-    const ADMIN_PASSWORD = "Pingu";   // ← cambia esto
-    const DEFAULT_MSG    = "Hola, sunmi";
-    const DOC_PATH       = { collection: "config", id: "mensaje" };
+  const firebaseConfig = {
+    apiKey: "AIzaSyBuwIzk4QTAgdkHWbO4wezoZu0GJV_g4KU",
+    authDomain: "sunmi-76dac.firebaseapp.com",
+    projectId: "sunmi-76dac",
+    storageBucket: "sunmi-76dac.firebasestorage.app",
+    messagingSenderId: "139512782548",
+    appId: "1:139512782548:web:2b441f886590c321e6e541"
+  };
 
-    /* ── FIREBASE ── */
-    const firebaseConfig = {
-      apiKey: "AIzaSyBuwIzk4QTAgdkHWbO4wezoZu0GJV_g4KU",
-      authDomain: "sunmi-76dac.firebaseapp.com",
-      projectId: "sunmi-76dac",
-      storageBucket: "sunmi-76dac.firebasestorage.app",
-      messagingSenderId: "139512782548",
-      appId: "1:139512782548:web:2b441f886590c321e6e541"
-    };
+  const app     = initializeApp(firebaseConfig);
+  const db      = getFirestore(app);
+  const storage = getStorage(app);
 
-    const app = initializeApp(firebaseConfig);
-    const db  = getFirestore(app);
+  /* ── BLOQUES ── */
+  // hasUpload: true = muestra botón "+"
+  const BLOCKS = [
+    { id: "para-ti",  title: "Para ti",   sub: "un mensaje",         hasUpload: false },
+    { id: "bloque-2", title: "Texto 1",   sub: "texto 2",            hasUpload: false },
+    { id: "bloque-3", title: "Texto 1",   sub: "texto 2",            hasUpload: false  },
+    { id: "bloque-4", title: "Texto 1",   sub: "texto 2",            hasUpload: false },
+    { id: "bloque-5", title: "Texto 1",   sub: "texto 2",            hasUpload: true  },
+    { id: "bloque-6", title: "Texto 1",   sub: "texto 2",            hasUpload: true },
+  ];
 
-    /* ── ELEMENTOS ── */
-    const lockScreen  = document.getElementById('lock-screen');
-    const mainScreen  = document.getElementById('main-screen');
-    const msgDisplay  = document.getElementById('message-display');
-    const editTrigger = document.getElementById('edit-trigger');
-    const editOverlay = document.getElementById('edit-overlay');
-    const editContent = document.getElementById('edit-content');
-    const adminGate   = document.getElementById('admin-gate');
-    const adminPw     = document.getElementById('admin-pw');
-    const editTA      = document.getElementById('edit-textarea');
-    const errMsg      = document.getElementById('err-msg');
-    const errAdmin    = document.getElementById('err-admin');
-    const savedNote   = document.getElementById('saved-note');
-    const inpDay      = document.getElementById('inp-day');
-    const inpMonth    = document.getElementById('inp-month');
-    const inpYear     = document.getElementById('inp-year');
+  /* ── ESTADO ── */
+  let currentBlock = null;
+  let fileInputTarget = null;
 
-    /* ── FIREBASE: leer y guardar ── */
-    async function loadMessage() {
-      try {
-        const snap = await getDoc(doc(db, DOC_PATH.collection, DOC_PATH.id));
-        return snap.exists() ? snap.data().texto : DEFAULT_MSG;
-      } catch {
-        return DEFAULT_MSG;
-      }
+  /* ── FIREBASE helpers ── */
+  async function loadDoc(id) {
+    try {
+      const snap = await getDoc(doc(db, "bloques", id));
+      return snap.exists() ? snap.data() : {};
+    } catch { return {}; }
+  }
+
+  async function saveDoc(id, data) {
+    await setDoc(doc(db, "bloques", id), data, { merge: true });
+  }
+
+  /* ── DOM ── */
+  const lockScreen  = document.getElementById('lock-screen');
+  const mainScreen  = document.getElementById('main-screen');
+  const innerScreen = document.getElementById('inner-screen');
+  const albumGrid   = document.getElementById('album-grid');
+  const innerLabel  = document.getElementById('inner-label');
+  const innerContent= document.getElementById('inner-content');
+  const innerFiles  = document.getElementById('inner-files');
+  const editTrigger = document.getElementById('edit-trigger');
+  const editOverlay = document.getElementById('edit-overlay');
+  const editContent = document.getElementById('edit-content');
+  const adminGate   = document.getElementById('admin-gate');
+  const adminPw     = document.getElementById('admin-pw');
+  const editTA      = document.getElementById('edit-textarea');
+  const errMsg      = document.getElementById('err-msg');
+  const errAdmin    = document.getElementById('err-admin');
+  const savedNote   = document.getElementById('saved-note');
+  const fileInput   = document.getElementById('file-input');
+
+  function showError(el, msg) {
+    el.textContent = msg; el.classList.add('visible');
+    setTimeout(() => el.classList.remove('visible'), 2500);
+  }
+
+  /* ── AUTO JUMP ── */
+  const inpDay = document.getElementById('inp-day');
+  const inpMonth = document.getElementById('inp-month');
+  const inpYear  = document.getElementById('inp-year');
+  function autoJump(el, maxLen, next) {
+    el.addEventListener('input', () => { if (el.value.length >= maxLen && next) next.focus(); });
+  }
+  autoJump(inpDay, 2, inpMonth);
+  autoJump(inpMonth, 2, inpYear);
+
+  /* ── FECHA ── */
+  function checkDate() {
+    return parseInt(inpDay.value)===ACCESS_DATE.day &&
+           parseInt(inpMonth.value)===ACCESS_DATE.month &&
+           parseInt(inpYear.value)===ACCESS_DATE.year;
+  }
+
+  /* ── ENTRAR ── */
+  async function enter() {
+    if (!checkDate()) {
+      showError(errMsg, 'fecha incorrecta');
+      [inpDay,inpMonth,inpYear].forEach(i=>i.value='');
+      inpDay.focus(); return;
     }
+    lockScreen.classList.add('fade-out');
+    setTimeout(async () => {
+      lockScreen.style.display = 'none';
+      await buildGrid();
+      mainScreen.classList.add('visible');
+      requestAnimationFrame(()=>requestAnimationFrame(()=>mainScreen.classList.add('fade-in')));
+    }, 500);
+  }
 
-    async function saveMessage(texto) {
-      await setDoc(doc(db, DOC_PATH.collection, DOC_PATH.id), { texto });
-    }
+  document.getElementById('btn-enter').addEventListener('click', enter);
+  [inpDay,inpMonth,inpYear].forEach(i=>i.addEventListener('keydown',e=>{if(e.key==='Enter')enter();}));
 
-    /* ── AUTO-JUMP ── */
-    function autoJump(el, maxLen, nextEl) {
-      el.addEventListener('input', () => {
-        if (el.value.length >= maxLen && nextEl) nextEl.focus();
+  /* ── BUILD GRID ── */
+  async function buildGrid() {
+    albumGrid.innerHTML = '';
+    for (const block of BLOCKS) {
+      const data = await loadDoc(block.id);
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.dataset.id = block.id;
+
+      // archivos 
+      const files = data.files || [];
+      const fileChips = files.slice(0,2).map(f=>
+        `<span class="file-chip"><a href="${f.url}" target="_blank">${f.name}</a></span>`
+      ).join('') + (files.length>2 ? `<span class="file-chip">+${files.length-2} más</span>` : '');
+
+      card.innerHTML = `
+        <div>
+          <div class="card-label">${block.id}</div>
+          <div class="card-title">${block.title}</div>
+          <div class="card-sub">${block.sub}</div>
+          ${files.length ? `<div class="card-files">${fileChips}</div>` : ''}
+        </div>
+        <div class="card-footer">
+          ${block.hasUpload ? `<button class="btn-add" data-upload="${block.id}" title="Adjuntar archivo">+</button>` : ''}
+        </div>
+      `;
+
+      // click en la card
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('.btn-add')) return; 
+        openBlock(block, data);
       });
+
+      albumGrid.appendChild(card);
     }
 
-    autoJump(inpDay, 2, inpMonth);
-    autoJump(inpMonth, 2, inpYear);
+    // botones "+"
+    document.querySelectorAll('.btn-add').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        fileInputTarget = btn.dataset.upload;
+        fileInput.click();
+      });
+    });
+  }
 
-    /* ── VALIDAR FECHA ── */
-    function checkDate() {
-      const d = parseInt(inpDay.value,   10);
-      const m = parseInt(inpMonth.value, 10);
-      const y = parseInt(inpYear.value,  10);
-      return d === ACCESS_DATE.day && m === ACCESS_DATE.month && y === ACCESS_DATE.year;
+  /* ── ABRIR BLOQUE ── */
+  async function openBlock(block, data) {
+    currentBlock = block;
+    innerLabel.textContent = block.id + ' — ' + block.title;
+
+    innerContent.textContent = data.texto || (block.id === 'para-ti' ? DEFAULT_MSG : '—');
+    // mostrar editar en todos los bloques sin botón "+"
+    editTrigger.style.display = block.hasUpload ? 'none' : 'block';
+
+    // archivos
+    const files = data.files || [];
+    innerFiles.innerHTML = files.map(f =>
+      `<span class="inner-file-chip"><a href="${f.url}" target="_blank">↗ ${f.name}</a></span>`
+    ).join('');
+
+    mainScreen.style.display = 'none';
+    innerScreen.classList.add('visible');
+    requestAnimationFrame(()=>requestAnimationFrame(()=>innerScreen.classList.add('fade-in')));
+  }
+
+  /* ── VOLVER ── */
+  document.getElementById('btn-back').addEventListener('click', async () => {
+    innerScreen.classList.remove('fade-in');
+    setTimeout(async () => {
+      innerScreen.classList.remove('visible');
+      currentBlock = null;
+      editTrigger.style.display = 'none';
+      await buildGrid();
+      mainScreen.style.display = 'flex';
+    }, 400);
+  });
+
+  /* ── UPLOAD FILE ── */
+  fileInput.addEventListener('change', async () => {
+    const files = Array.from(fileInput.files);
+    if (!files.length || !fileInputTarget) return;
+
+    const blockId = fileInputTarget;
+    const data = await loadDoc(blockId);
+    const existing = data.files || [];
+    const newFiles = [];
+
+    for (const file of files) {
+      const storageRef = ref(storage, `bloques/${blockId}/${Date.now()}_${file.name}`);
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+      newFiles.push({ name: file.name, url });
     }
 
-    function showError(el, msg) {
-      el.textContent = msg;
-      el.classList.add('visible');
-      setTimeout(() => el.classList.remove('visible'), 2500);
-    }
+    await saveDoc(blockId, { files: [...existing, ...newFiles] });
+    await buildGrid();
+    fileInput.value = '';
+    fileInputTarget = null;
+  });
 
-    /* ── ENTRAR ── */
-    async function enter() {
-      if (!checkDate()) {
-        showError(errMsg, 'fecha incorrecta');
-        [inpDay, inpMonth, inpYear].forEach(i => i.value = '');
-        inpDay.focus();
-        return;
-      }
+  /* ── EDITOR ── */
+  let adminUnlocked = false;
 
-      lockScreen.classList.add('fade-out');
+  editTrigger.addEventListener('click', () => {
+    // resetear estado del panel
+    adminUnlocked = false;
+    adminPw.value = '';
+    errAdmin.classList.remove('visible');
+    adminGate.style.display  = 'flex';
+    editContent.classList.remove('unlocked');
+    editTA.value = '';
+    editOverlay.classList.add('open');
+    setTimeout(() => adminPw.focus(), 120);
+  });
 
-      setTimeout(async () => {
-        lockScreen.style.display = 'none';
-        mainScreen.classList.add('visible');
-        editTrigger.style.display = 'block';
+  function closeEditor() {
+    editOverlay.classList.remove('open');
+  }
 
-        const texto = await loadMessage();
-        msgDisplay.textContent = texto;
+  document.getElementById('close-edit').addEventListener('click', closeEditor);
+  document.getElementById('btn-cancel-edit').addEventListener('click', closeEditor);
 
-        requestAnimationFrame(() =>
-          requestAnimationFrame(() => mainScreen.classList.add('fade-in'))
-        );
-      }, 500);
-    }
-
-    document.getElementById('btn-enter').addEventListener('click', enter);
-    [inpDay, inpMonth, inpYear].forEach(inp =>
-      inp.addEventListener('keydown', e => { if (e.key === 'Enter') enter(); })
-    );
-
-    /* ── ABRIR EDITOR ── */
-    editTrigger.addEventListener('click', () => {
-      adminGate.style.display = 'flex';
-      editContent.classList.remove('unlocked');
+  function unlockEdit() {
+    if (adminPw.value === ADMIN_PASSWORD) {
+      adminUnlocked = true;
+      adminGate.style.display = 'none';
+      editTA.value = innerContent.textContent === '—' ? '' : innerContent.textContent;
+      editContent.classList.add('unlocked');
+      setTimeout(() => editTA.focus(), 80);
+    } else {
+      showError(errAdmin, 'contraseña incorrecta');
       adminPw.value = '';
-      errAdmin.classList.remove('visible');
-      editOverlay.classList.add('open');
-      setTimeout(() => adminPw.focus(), 100);
-    });
-
-    /* ── CERRAR EDITOR ── */
-    function closeEditor() { editOverlay.classList.remove('open'); }
-    document.getElementById('close-edit').addEventListener('click', closeEditor);
-    document.getElementById('btn-cancel-edit').addEventListener('click', closeEditor);
-
-    /* ── DESBLOQUEAR ── */
-    function unlockEdit() {
-      if (adminPw.value === ADMIN_PASSWORD) {
-        adminGate.style.display = 'none';
-        editTA.value = msgDisplay.textContent;
-        editContent.classList.add('unlocked');
-        editTA.focus();
-      } else {
-        showError(errAdmin, 'contraseña incorrecta');
-        adminPw.value = '';
-      }
     }
+  }
 
-    document.getElementById('btn-unlock').addEventListener('click', unlockEdit);
-    adminPw.addEventListener('keydown', e => { if (e.key === 'Enter') unlockEdit(); });
+  document.getElementById('btn-unlock').addEventListener('click', unlockEdit);
+  adminPw.addEventListener('keydown', e => { if (e.key === 'Enter') unlockEdit(); });
 
-    /* ── GUARDAR ── */
-    async function saveEdit() {
-      const newMsg = editTA.value.trim() || DEFAULT_MSG;
-      await saveMessage(newMsg);
-      msgDisplay.textContent = newMsg;
-      savedNote.classList.add('show');
-      setTimeout(() => savedNote.classList.remove('show'), 2000);
-      setTimeout(closeEditor, 600);
-    }
+  async function saveEdit() {
+    if (!currentBlock) return;
+    const fallback = currentBlock.id === 'para-ti' ? DEFAULT_MSG : '—';
+    const newMsg = editTA.value.trim() || fallback;
+    await saveDoc(currentBlock.id, { texto: newMsg });
+    innerContent.textContent = newMsg;
+    savedNote.classList.add('show');
+    setTimeout(() => savedNote.classList.remove('show'), 2000);
+    setTimeout(closeEditor, 500);
+  }
 
-    document.getElementById('btn-save-edit').addEventListener('click', saveEdit);
-    editTA.addEventListener('keydown', e => {
-      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) saveEdit();
-    });
-  </script>
+  document.getElementById('btn-save-edit').addEventListener('click', saveEdit);
+  editTA.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) saveEdit(); });
+</script>
 </body>
 </html>
